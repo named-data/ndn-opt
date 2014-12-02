@@ -8,7 +8,7 @@
 
 #include <ros/ros.h>
 #include <opt_msgs/TrackArray.h>
-#include <open_ptrack/opt_utils/json.h>
+#include <json.h>
 
 // Constants
 const std::string NdnAppComponent = "opt";	// NDN application component
@@ -20,6 +20,7 @@ const std::string NdnAppComponent = "opt";	// NDN application component
 // Global variables:
 int ndn_segment_length; // NDN segment length - if JSON message is larger, it
 			// is split into several segments
+int buffer_length = 2048;
 std::string prefix;	// NDN prefix used
 std::string node_name;  // name of the node used while publishing NDN data
 int json_indent_size;   // indent size for JSON message
@@ -28,12 +29,14 @@ bool json_spacing;      // use spacing (true) or not (false) in JSON messages
 bool json_use_tabs;     // use tabs (true) or not (false) in JSON messages
 
 
-class ndn_opt::NDNMessaging;
-ndn_opt::NDNMessaging ndn_messaging();
+// class ndn_opt::NDNMessaging;
+// ndn_opt::NDNMessaging ndn_messaging();
 
 void
 trackingCallback(const opt_msgs::TrackArray::ConstPtr& tracking_msg)
 {
+  ROS_INFO_STREAM("called") ;
+
   /// Create JSON-formatted message:
   Jzon::Object root, header, stamp;
 
@@ -72,8 +75,8 @@ trackingCallback(const opt_msgs::TrackArray::ConstPtr& tracking_msg)
 //  std::cout << "String sent: " << json_string << std::endl;
 
   /// Copy string to message buffer:
-  char buf[udp_buffer_length];
-  for (unsigned int i = 0; i < udp_buffer_length; i++)
+  char buf[buffer_length];
+  for (unsigned int i = 0; i < buffer_length; i++)
   {
     buf[i] = 0;
   }
@@ -81,7 +84,7 @@ trackingCallback(const opt_msgs::TrackArray::ConstPtr& tracking_msg)
 //  udp_data.pc_pck_ = buf;         // buffer where the message is written
 
   /// Send message:
-  printf("message sent: %s", buf);
+  ROS_INFO_STREAM("message sent: " << buf);
 //  udp_messaging.sendFromSocketUDP(&udp_data);
 }
 
@@ -111,6 +114,7 @@ main(int argc, char **argv)
   /// Create object for NDN messaging:
 
   // Execute callbacks:
+  ROS_INFO_STREAM("start spinning");
   ros::spin();
 
   return 0;

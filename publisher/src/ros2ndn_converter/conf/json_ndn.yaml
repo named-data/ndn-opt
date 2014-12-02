@@ -1,0 +1,11 @@
+ndn:
+  prefix: /ndn/edu/ucla/remap
+  segment_length: 2048
+  node_name: "node0"
+
+json:
+  indent_size: 0
+  newline: false
+  spacing: false
+  use_tabs: false
+  

@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="ndn_utils" type="ros2ndn_converter" name="ros2ndn_converter" output="screen">
+    <remap from ="~input_topic" to="/tracker/tracks_smoothed"/>  
+    <rosparam command="load" file="$(find ndn_utils)/conf/json_ndn.yaml" /> 
+  </node>
+</launch>
+
