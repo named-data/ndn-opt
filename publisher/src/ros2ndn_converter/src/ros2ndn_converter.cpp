@@ -9,6 +9,7 @@
 #include <ros/ros.h>
 #include <opt_msgs/TrackArray.h>
 #include <json.h>
+#include <ndn_messaging.h>
 
 // Constants
 const std::string NdnAppComponent = "opt";	// NDN application component
@@ -28,9 +29,7 @@ bool json_newline;      // use newlines (true) or not (false) in JSON messages
 bool json_spacing;      // use spacing (true) or not (false) in JSON messages
 bool json_use_tabs;     // use tabs (true) or not (false) in JSON messages
 
-
-// class ndn_opt::NDNMessaging;
-// ndn_opt::NDNMessaging ndn_messaging();
+ndn::opt::NDNMessaging ndn_messaging();
 
 void
 trackingCallback(const opt_msgs::TrackArray::ConstPtr& tracking_msg)
