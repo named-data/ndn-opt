@@ -36,11 +36,6 @@
  	*/
  	class NdnController {
 	public:
-		static const std::string NdnAppComponent;	// NDN application component
-						// this component is used for forming a "node" prefix:
-						// <prefix>/<NdnAppComponent>/<node_name>/...
-						// where prefix and node_name are supplied through
-						// arguments list		
 		typedef struct _Parameters
 		{
 			ros::NodeHandle nh;
@@ -62,8 +57,18 @@
 		int
 		publishMessage(const std::string& name, const int& dataFreshnessMs, const void* message, const int& messageLength);
 
+		std::string
+		getBasePrefix()
+		{ return parameters_.prefix; }
+
 		static std::string
 		getInstancePrefix(const std::string& hubPrefix, const std::string& nodeName);
+
+		static int 
+		getInstanceStartTime();
+
+		static void
+		instanceStart();
 
 	private:
 		ros::WallTimer faceEventsTimer_;

@@ -11,11 +11,12 @@
 #include <boost/thread/mutex.hpp>
 
 #include "ndn_controller.h"
+#include "common.h"
 
 using namespace ndn;
 using namespace std;
 
-const string NdnController::NdnAppComponent = "opt";
+static int instanceStartTime_ = 0;
 
 NdnController::NdnController(const Parameters& parameters):
 parameters_(parameters),
@@ -104,12 +105,27 @@ NdnController::publishMessage(const string& name, const int& dataFreshnessMs, co
 
 string
 NdnController::getInstancePrefix(const string& hubPrefix, const string& nodeName)
-{
-	ros::Time time = ros::Time::now();
+{	
 	stringstream ss;
-	ss << hubPrefix << "/" << NdnAppComponent << "/" << nodeName << "/" << time.sec;
+	ss << hubPrefix << "/" << NameComponents::NameComponentApp << "/" << nodeName << "/" << NdnController::getInstanceStartTime();
 
 	return ss.str();
+}
+
+void 
+NdnController::instanceStart()
+{
+	if (instanceStartTime_ == 0)
+	{
+		ros::Time time = ros::Time::now();
+		instanceStartTime_ = time.sec;	
+	}
+}
+
+int
+NdnController::getInstanceStartTime()
+{
+	return instanceStartTime_;
 }
 
 // private

@@ -12,8 +12,6 @@ using namespace std;
 using namespace ndn;
 using namespace ndn::opt;
 
-const std::string TrackPublisher::TracksNameComponent = "tracks";
-
 TrackPublisher::TrackPublisher(const Parameters& parameters):
 parameters_(parameters)
 {
@@ -71,8 +69,8 @@ TrackPublisher::trackingCallback(const opt_msgs::TrackArray::ConstPtr& tracking_
     int seqNo = getNextSeqNum(tracking_msg->tracks[i].id);
     stringstream messageName;
     
-    messageName << parameters_.basePrefix << "/" << TracksNameComponent << "/" << tracking_msg->tracks[i].id << "/" << seqNo;
-    
+    messageName << parameters_.ndnController->getBasePrefix() << "/" << NameComponents::NameComponentTracks << "/" << tracking_msg->tracks[i].id << "/" << seqNo;
+
     parameters_.ndnController->publishMessage(messageName.str(), parameters_.freshnessPeriod, (void*)json_string.c_str(), json_string.size());
     parameters_.activeTracks->newTrack(int(tracking_msg->header.stamp.sec), int(tracking_msg->header.stamp.nsec), tracking_msg->tracks[i].id, seqNo);
 

@@ -20,4 +20,13 @@ typedef struct _JsonParameters {
 	std::string toString(const Jzon::Object& jsonObject);
 } JsonParameters;
 
+class NameComponents
+{
+public:
+	static const std::string NameComponentApp;
+	static const std::string NameComponentTracks;
+	static const std::string NameComponentTrackHints;
+	static const std::string NameComponentMeta;
+};
+
 #endif

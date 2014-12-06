@@ -30,13 +30,10 @@ namespace ndn
 		class TrackPublisher
 		{
 		public:
-			static const std::string TracksNameComponent;
-
 			typedef struct _Parameters {
 				ros::NodeHandle nh;
 				int bufferLength;
 				int freshnessPeriod;
-				std::string basePrefix;
 				JsonParameters jsonParameters;
 
 				ActiveTracks* activeTracks;

@@ -19,6 +19,7 @@ main(int argc, char **argv)
   // Initialization:
   ros::init(argc, argv, "ros2ndn_converter");
   ros::NodeHandle nh("~");
+  ndn::NdnController::instanceStart();
 
   ndn::NdnController::Parameters ncParams;
   
@@ -42,7 +43,6 @@ main(int argc, char **argv)
   nh.param("json/spacing", tpParams.jsonParameters.jsonSpacing, false);
   nh.param("json/use_tabs", tpParams.jsonParameters.jsonUseTabs, false);
   tpParams.bufferLength = 2048;
-  tpParams.basePrefix = ncParams.prefix;
   tpParams.nh = ncParams.nh;
 
   try 
