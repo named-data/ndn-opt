@@ -14,6 +14,10 @@ Directories structure follows established [ROS guidelines](http://wiki.ros.org/R
             -  CMakeLists.txt // _[catkin cmake file](http://wiki.ros.org/catkin/CMakeLists.txt)_
             -  package.xml  // _[catkin package xml file](http://wiki.ros.org/catkin/package.xml)_
 
+### Prerequisites
+
+1. [NDN-CPP library](github.com/named-data/ndn-cpp)
+
 ### How to use
 1. Clone repository
 2. Build the package and make sure it is visible to ROS:
@@ -26,12 +30,16 @@ $ source devel/setup.bash
 $ rospack find ndn_utils
 &lt;repo_full_path&gt;/publisher/src/ros2ndn_converter
 </pre>
-4. Launch node:
+4. Add shared library path to ROS environmental variable:
+<pre>
+    $ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+</pre>
+5. Launch node:
 <pre>
 $ roslaunch ndn_utils ros2ndn_converter.launch
 </pre>
 
-> **NOTE:** in order to start publishing tracking data over NDN, make sure you have started tracking as well (by running `roslaunch tracking tracking_node.launch` from the terminal). You may also try the latest commit from [OpenPTrack NDN branch](https://github.com/OpenPTrack/open_ptrack/tree/ndn) where execution of the aforementioned command starts **ros2ndn_converter** automatically (however **ndn_utils** package has to be already installed).
+> **NOTE:** in order to start publishing tracking data over NDN, make sure you have started tracking as well (by running `roslaunch tracking tracking_node.launch` from the terminal).
 
 ### NDN Namespace
 Sample track data received from OpenPTrack:

@@ -42,7 +42,9 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-
+  
+  <build_depend>libndn-cpp</build_depend>
+  <run_depend>libndn-cpp</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

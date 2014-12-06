@@ -1,7 +1,10 @@
 ndn:
-  prefix: /ndn/edu/ucla/remap
+  host: "localhost"
+  port: 6363
+  prefix: "/ndn/edu/ucla/remap"
   segment_length: 2048
   node_name: "node0"
+  freshness_period: 5000
 
 json:
   indent_size: 0

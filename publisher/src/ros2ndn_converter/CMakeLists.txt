@@ -9,7 +9,6 @@ set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 find_package(catkin REQUIRED)
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
 find_package(catkin REQUIRED COMPONENTS roscpp opt_msgs)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -79,9 +78,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp opt_msgs)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES json
+  LIBRARIES json 
   CATKIN_DEPENDS roscpp
-#  DEPENDS system_lib
 )
 
 ###########
@@ -97,7 +95,7 @@ add_library(json src/json.cpp)
 target_link_libraries(json ${catkin_LIBRARIES})
 
 ## Declare a cpp executable
-add_executable(ros2ndn_converter src/ros2ndn_converter.cpp)
+add_executable(ros2ndn_converter src/ros2ndn_converter.cpp src/ndn_controller.cpp src/active_tracks.cpp src/track_publisher.cpp src/common.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -105,7 +103,7 @@ add_executable(ros2ndn_converter src/ros2ndn_converter.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ros2ndn_converter
-  ${catkin_LIBRARIES} json
+  ${catkin_LIBRARIES} json ndn-cpp
 )
 
 #############
