@@ -20,6 +20,7 @@ parameters_(parameters)
 
 TrackHintPublisher::~TrackHintPublisher()
 {
+	stop();
 	ROS_DEBUG_STREAM("TrackHintPublisher dtor");
 }
 
@@ -27,7 +28,7 @@ void
 TrackHintPublisher::start()
 {
 	ROS_DEBUG_STREAM("starting TrackHintPublisher...");
-	sampleTimer_ = parameters_.nh.createWallTimer(ros::WallDuration(1./float(parameters_.rate), &TrackHintPublisher::publishTrackHint, this));
+	sampleTimer_ = parameters_.nh.createWallTimer(ros::WallDuration(1./double(parameters_.rate)), &TrackHintPublisher::publishTrackHint, this);
 	ROS_DEBUG_STREAM("TrackHintPublisher started.");
 }
 
@@ -49,8 +50,14 @@ TrackHintPublisher::publishTrackHint(const ros::WallTimerEvent& timerEvent)
 		string jsonString = parameters_.activeTracks->getCurrentHintData();
 		stringstream hintName;
 
-		hintName << parameters_.ndnController->getBasePrefix() << NameComponents::NameComponentTrackHint << offsetMs;
+		hintName << parameters_.ndnController->getBasePrefix() << "/" << NameComponents::NameComponentTrackHints << "/" << offsetMs;
 		parameters_.ndnController->publishMessage(hintName.str(), parameters_.freshnessPeriod, 
 			(const void*)jsonString.c_str(), jsonString.size());
+
+		parameters_.activeTracks->invalidate();
+
+		ROS_INFO_STREAM("published hint " << hintName.str() << " : " << jsonString);
 	}
+	else
+		ROS_DEBUG_STREAM("no hints to publish");
 }

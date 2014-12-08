@@ -35,6 +35,7 @@ ActiveTracks::newTrack(const int sec, const int nsec, const int trackId, const i
 {
 	boost::mutex::scoped_lock scopedLock(mutex_);
 	
+	isUpdated_ = true;
 	latestTimestampSec_ = sec;
 	latestTimestampNsec_ = nsec;
 	activeTracksSeqNumbers_[trackId] = seqNo;
@@ -72,7 +73,7 @@ ActiveTracks::getCurrentHintData()
 	{
 		Jzon::Object activeTrack;
 		activeTrack.Add("id", it->first);
-		activeTrack.Add("id", it->second);
+		activeTrack.Add("seq", it->second);
 
 		activeTracks.Add(activeTrack);
 	}

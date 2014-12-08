@@ -29,3 +29,6 @@
 
 *build*
 *devel*
+._*
+.fseventsd
+.catkin_workspace

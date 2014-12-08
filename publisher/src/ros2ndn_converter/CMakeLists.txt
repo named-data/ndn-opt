@@ -95,7 +95,7 @@ add_library(json src/json.cpp)
 target_link_libraries(json ${catkin_LIBRARIES})
 
 ## Declare a cpp executable
-add_executable(ros2ndn_converter src/ros2ndn_converter.cpp src/ndn_controller.cpp src/active_tracks.cpp src/track_publisher.cpp src/common.cpp)
+add_executable(ros2ndn_converter src/ros2ndn_converter.cpp src/ndn_controller.cpp src/active_tracks.cpp src/track_publisher.cpp src/common.cpp src/track_hint_publisher.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes

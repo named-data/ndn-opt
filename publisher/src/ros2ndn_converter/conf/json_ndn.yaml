@@ -12,3 +12,6 @@ json:
   spacing: false
   use_tabs: false
   
+hints:
+  rate: 5
+  freshness_period: 200
