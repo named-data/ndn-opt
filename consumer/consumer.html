@@ -17,10 +17,21 @@
     
     function run()
     {
-      var face = new Face({host: Config.hostName, port: Config.wsPort});
+      var face;
+      if (Config.hostName != "") {
+        if (Config.wsPort != 0) {
+          face = new Face({host: Config.hostName, port: Config.wsPort});
+        }
+        else {
+          face = new Face({host: Config.hostName});
+        }
+      }
+      else {
+        face = new Face();
+      }
       
-      var rootPrefix = new Name("/ndn/edu/ucla/remap/opt");
-      var spaceName = new Name("node0");
+      var rootPrefix = new Name(Config.rootPrefix);
+      var spaceName = new Name(Config.spaceName);
       
       var consumer = new Consumer(face, rootPrefix, spaceName, displayCallback);
       consumer.start();

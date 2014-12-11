@@ -24,7 +24,7 @@ var Consumer = function(face, root, spaceName, displayCallback)
   
   this.startTimeComponent = new Name.Component();
   // this records the indices of the tracks that have been active since the start of this run.
-  this.activeTrack = [];
+  this.activeTracks = [];
   
   // All fetched track data is stored in this array: may want to organize it.
   // Are we expecting a large number of entries, which means I should flush this array at some point?
@@ -41,7 +41,7 @@ Consumer.prototype.getTrackData = function()
 
 Consumer.prototype.getActiveTrack = function()
 {
-  return this.activeTrack;
+  return this.activeTracks;
 };
 
 // Expected data name: [root]/opt/[node_num]/[start_timestamp]/tracks/[track_num]/[seq_num]
@@ -53,6 +53,17 @@ Consumer.prototype.onTrackData = function(interest, data)
   
   if (this.displayCallback) {
     this.displayCallback(parsedTrack);
+  }
+  
+  var trackId = parseInt(interest.getName().get
+    (ProducerNameComponents.trackIdOffset).toEscapedString());
+  var activeTrackIndex = this.indexOfTrackId(trackId);
+  if (activeTrackIndex != -1) {
+    this.activeTracks[activeTrackIndex].timeoutCnt = 0;
+  }
+  else {
+	this.activeTracks.push({"id": trackId,
+						   "timeoutCnt": 0});
   }
   
   var receivedSeq = interest.getName().get(-1).toEscapedString();
@@ -84,21 +95,21 @@ Consumer.prototype.onTrackTimeout = function(interest)
   var activeTrackIndex = this.indexOfTrackId(trackId);
   
   if (activeTrackIndex != -1) {
-    if (this.activeTrack[activeTrackIndex].timeoutCnt < Config.trackTimeoutThreshold) {
+    if (this.activeTracks[activeTrackIndex].timeoutCnt < Config.trackTimeoutThreshold) {
 	  this.face.expressInterest
 	    (interest, this.onTrackData.bind(this), this.onTrackTimeout.bind(this));
-	  this.activeTrack[activeTrackIndex].timeoutCnt ++;
+	  this.activeTracks[activeTrackIndex].timeoutCnt ++;
 	}
 	else {
-	  this.activeTrack.splice(activeTrackIndex, 1);
+	  this.activeTracks.splice(activeTrackIndex, 1);
 	}
   }
 };
 
 Consumer.prototype.indexOfTrackId = function(id)
 {
-  for (var i = 0; i < this.activeTrack.length; i++) {
-    if (this.activeTrack[i].id == id) {
+  for (var i = 0; i < this.activeTracks.length; i++) {
+    if (this.activeTracks[i].id == id) {
       return i;
     }
   }
@@ -118,7 +129,7 @@ Consumer.prototype.onHintData = function(interest, data)
     // Right now the consumer does not stop fetching tracks that have become inactive.
     if (this.indexOfTrackId(parsedHint.tracks[i].id) == -1) {
       this.fetchTrack(parsedHint.tracks[i].id);
-      this.activeTrack.push({"id": parsedHint.tracks[i].id,
+      this.activeTracks.push({"id": parsedHint.tracks[i].id,
                              "timeoutCnt": 0});
     }
   }

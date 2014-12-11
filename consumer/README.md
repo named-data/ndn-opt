@@ -1,1 +1,18 @@
-OpenPTrack consumer in browser; Requires NDN-JS
+# OpenPTrack NDN consumer in browser
+
+### Prerequisites 
+1. [NDN-JS](https://github.com/named-data/ndn-js/blob/master/build/ndn.js)
+
+### How to use
+1. Clone repository
+2. Replace the link to ndn.js in consumer directory with actual ndn.js
+3. Edit [config.js](https://github.com/named-data/ndn-opt/blob/master/consumer/config.js) for namespace and face setup
+4. Launch [consumer.html](https://github.com/named-data/ndn-opt/blob/master/consumer/consumer.html) in a browser
+5. Make sure producer's running, and the nfd websocket you are connecting to has a route to the producer
+
+### Consumer
+The consumer maintains an outstanding interest for track hint. 
+
+For each new active track mentioned in track hint, consumer maintains an outstanding interest for its sequential data.
+
+The consumer stops maintaining outstanding interest for a track when a series of timeouts is received.

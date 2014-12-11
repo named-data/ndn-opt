@@ -9,8 +9,12 @@
 
 Config = {
   // Face configuration
-  hostName	: "localhost",
-  wsPort	: 19696,
+  hostName					: "localhost",
+  wsPort					: 9696,
+  
+  // Namespace configuration
+  rootPrefix				: "/ndn/edu/ucla/remap/opt",
+  spaceName					: "node0",
   
   // Interest configuration
   initialReexpressInterval	: 1000,
