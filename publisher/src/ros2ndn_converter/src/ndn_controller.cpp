@@ -104,6 +104,15 @@ NdnController::publishMessage(const string& name, const int& dataFreshnessMs, co
 }
 
 string
+NdnController::getBasePrefix()
+{
+	stringstream ss;
+	ss << parameters_.prefix << "/" << getInstanceStartTime();
+
+	return ss.str();
+}
+
+string
 NdnController::getInstancePrefix(const string& hubPrefix, const string& nodeName)
 {	
 	stringstream ss;
