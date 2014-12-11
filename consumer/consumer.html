@@ -1,0 +1,31 @@
+<html xmlns = "http://www.w3.org/1999/xhtml">
+<meta charset="UTF-8">
+
+<head>
+  <title>NDN-OPT consumer webpage</title>
+
+  <script type="text/javascript" src="ndn.js"></script>
+  <script type="text/javascript" src="config.js"></script>
+  <script type="text/javascript" src="consumer.js"></script>
+  
+  <script type="text/javascript">
+    function run()
+    {
+      var face = new Face({host: Config.hostName, port: Config.wsPort});
+      
+      var rootPrefix = new Name("/ndn/edu/ucla/remap/opt");
+      var spaceName = new Name("node0");
+      
+      var consumer = new Consumer(face, rootPrefix, spaceName);
+      consumer.start();
+    }
+  </script>
+</head>
+
+<body>
+  <button id="testBtn" onclick="run()">Start consumer</button>
+
+  <p id="content">Content: <br/></p>
+</body>
+
+<html>
