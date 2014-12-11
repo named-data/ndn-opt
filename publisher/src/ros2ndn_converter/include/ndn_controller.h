@@ -58,8 +58,7 @@
 		publishMessage(const std::string& name, const int& dataFreshnessMs, const void* message, const int& messageLength);
 
 		std::string
-		getBasePrefix()
-		{ return parameters_.prefix; }
+		getBasePrefix();
 
 		static std::string
 		getInstancePrefix(const std::string& hubPrefix, const std::string& nodeName);
