@@ -107,7 +107,7 @@ string
 NdnController::getInstancePrefix(const string& hubPrefix, const string& nodeName)
 {	
 	stringstream ss;
-	ss << hubPrefix << "/" << NameComponents::NameComponentApp << "/" << nodeName << "/" << NdnController::getInstanceStartTime();
+	ss << hubPrefix << "/" << NameComponents::NameComponentApp << "/" << nodeName;
 
 	return ss.str();
 }
