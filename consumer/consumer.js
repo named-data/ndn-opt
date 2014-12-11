@@ -10,12 +10,13 @@
 /**
  * Consumer creates a consumer for ndn-opt; The consumer follows the protocol
  * described here: https://github.com/named-data/ndn-opt/tree/master/publisher
+ * Multithread access of consumer is not taken care of in this implementation.
  *
  * @param {Face} The websocket face which consumer uses;
  * @param {Name} The [root] prefix that producer uses; Before [space_name] component;
  * @param {Name} The [space_name] prefix that producer uses; Full prefix = root + space_name
  */
-var Consumer = function(face, root, spaceName)
+var Consumer = function(face, root, spaceName, displayCallback)
 {
   this.face = face;
   this.prefix = new Name(root);
@@ -25,9 +26,22 @@ var Consumer = function(face, root, spaceName)
   // this records the indices of the tracks that have been active since the start of this run.
   this.activeTrack = [];
   
-  // the fetched track data is stored in this array: may want to organize it.
+  // All fetched track data is stored in this array: may want to organize it.
   // Are we expecting a large number of entries, which means I should flush this array at some point?
-  this.tracks = [];
+  this.trackData = [];
+  
+  // Display callback is called once track data is received
+  this.displayCallback = displayCallback;
+};
+
+Consumer.prototype.getTrackData = function()
+{
+  return this.trackData;
+};
+
+Consumer.prototype.getActiveTrack = function()
+{
+  return this.activeTrack;
 };
 
 // Expected data name: [root]/opt/[node_num]/[start_timestamp]/tracks/[track_num]/[seq_num]
@@ -35,14 +49,19 @@ Consumer.prototype.onTrackData = function(interest, data)
 {
   console.log(data.getName().toUri());
   var parsedTrack = JSON.parse(data.getContent().buf());
-  console.log(parsedTrack);
-   
-  this.tracks.push(parsedTrack);
+  this.trackData.push(parsedTrack);
   
-  var receivedSeq = interest.get(-1).toUri();
+  if (this.displayCallback) {
+    this.displayCallback(parsedTrack);
+  }
+  
+  var receivedSeq = interest.getName().get(-1).toEscapedString();
   var seq = parseInt(receivedSeq) + 1;
   
-  var trackInterest = new Interest(data.getName().getPrefix(-1).append(seq));
+  var trackInterest = new Interest(data.getName().getPrefix(-1).append(seq.toString()));
+  
+  console.log(trackInterest.getName().toUri());
+  
   trackInterest.setMustBeFresh(true);
   trackInterest.setInterestLifetimeMilliseconds(Config.defaultTrackLifetime);
   this.face.expressInterest
@@ -52,53 +71,80 @@ Consumer.prototype.onTrackData = function(interest, data)
 Consumer.prototype.onTrackTimeout = function(interest)
 {
   console.log("onTrackTimeout called: " + interest.getName().toUri());
-  console.log("Host: " + face.connectionInfo.toString());
+  console.log("Host: " + this.face.connectionInfo.toString());
   
   // Express timeout interest; this may not be needed for track fetching:
-  // we can express the instant timeout happens.
+  // we can reexpress the instant timeout happens.
   //var timeout = new Interest(new Name("/local/timeout"));
   //timeout.setInterestLifetimeMilliseconds(Config.defaultReexpressInterval);
   
-  this.face.expressInterest
-    (interest, this.onTrackData.bind(this), this.onTrackTimeout.bind(this));
+  // trackId is always assumed to be 
+  var trackId = parseInt(interest.getName().get
+    (ProducerNameComponents.trackIdOffset).toEscapedString());
+  var activeTrackIndex = this.indexOfTrackId(trackId);
+  
+  if (activeTrackIndex != -1) {
+    if (this.activeTrack[activeTrackIndex].timeoutCnt < Config.trackTimeoutThreshold) {
+	  this.face.expressInterest
+	    (interest, this.onTrackData.bind(this), this.onTrackTimeout.bind(this));
+	  this.activeTrack[activeTrackIndex].timeoutCnt ++;
+	}
+	else {
+	  this.activeTrack.splice(activeTrackIndex, 1);
+	}
+  }
 };
+
+Consumer.prototype.indexOfTrackId = function(id)
+{
+  for (var i = 0; i < this.activeTrack.length; i++) {
+    if (this.activeTrack[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 // Expected data name: [root]/opt/[node_num]/[start_timestamp]/track_hint/[num]
 Consumer.prototype.onHintData = function(interest, data)
 {
-  console.log("onHintData called: " + interest.getName().toUri());
+  console.log("onHintData called: " + data.getName().toUri());
   var parsedHint = JSON.parse(data.getContent().buf());
-  //console.log(parsedHint);
   
-  for (var i = 0; i < parsedHint.tracks.size(); i++) {
-    console.log(parsedHint.tracks[i]);
+  for (var i = 0; i < parsedHint.tracks.length; i++) {
     
     // The consumer ignores the sequence number field in the hint for now;
     // As the consumer assumes it's getting the latest via outstanding interest.
     // Right now the consumer does not stop fetching tracks that have become inactive.
-    if (parsedHint.tracks.indexOf(parsedHint.tracks[i].id) == -1) {
+    if (this.indexOfTrackId(parsedHint.tracks[i].id) == -1) {
       this.fetchTrack(parsedHint.tracks[i].id);
-      this.activeTrack.push(parsedHint.tracks[i].id);
+      this.activeTrack.push({"id": parsedHint.tracks[i].id,
+                             "timeoutCnt": 0});
     }
   }
   // express interest for the new hint
-  var hintInterest = new Interest();
+  var hintName = new Name(this.prefix);
+  hintName.append(this.startTimeComponent).append(ProducerNameComponents.trackHint);
+  
+  var hintInterest = new Interest(hintName);
   
   // should exclude the older one
   var exclude = new Exclude();
+  
   exclude.appendAny();
   exclude.appendComponent(data.getName().get(-1));
   hintInterest.setExclude(exclude);
   
   hintInterest.setMustBeFresh(true);
   hintInterest.setInterestLifetimeMilliseconds(Config.defaultHintLifetime);
-  this.face.expressInerest(hintInterest, this.onHintData, this.onHintTimeout);
+  this.face.expressInterest
+    (hintInterest, this.onHintData.bind(this), this.onHintTimeout.bind(this));
 };
 
 Consumer.prototype.onHintTimeout = function(interest)
 {
   console.log("onHintTimeout called: " + interest.getName().toUri());
-  console.log("Host: " + face.connectionInfo.toString());
+  console.log("Host: " + this.face.connectionInfo.toString());
   
   // Express timeout interest; this may not be needed for track fetching:
   // we can express the instant timeout happens.
@@ -118,7 +164,7 @@ Consumer.prototype.onMetaData = function(interest, data)
 Consumer.prototype.onMetaTimeout = function(interest)
 {
   console.log("onTimeout called for interest " + interest.getName().toUri());
-  console.log("Host: " + face.connectionInfo.toString());
+  console.log("Host: " + this.face.connectionInfo.toString());
 };
 
 Consumer.prototype.onInitialData = function(interest, data)
@@ -167,10 +213,11 @@ Consumer.prototype.dummyOnData = function(interest, data)
 Consumer.prototype.fetchTrack = function(trackId)
 {
   var trackName = new Name(this.prefix);
+  
   trackName.append
     (this.startTimeComponent).append
     (ProducerNameComponents.tracks).append
-    (trackId).append(0);
+    (trackId.toString()).append("0");
   
   var trackInterest = new Interest(trackName);
   trackInterest.setMustBeFresh(true);

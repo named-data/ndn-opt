@@ -16,10 +16,15 @@ Config = {
   initialReexpressInterval	: 1000,
   defaultInitialLifetime	: 2000,
   defaultTrackLifetime		: 250,
-  defaultHintLifetime		: 500
+  defaultHintLifetime		: 500,
+  
+  // The threshold for number of timeouts received in a row to decide not to fetch certain
+  // track anymore
+  trackTimeoutThreshold		: 20
 };
 
 ProducerNameComponents = {
-  tracks	: "tracks",
-  trackHint	: "track_hint"
+  tracks		: "tracks",
+  trackHint		: "track_hint",
+  trackIdOffset	: -2
 };

@@ -9,6 +9,12 @@
   <script type="text/javascript" src="consumer.js"></script>
   
   <script type="text/javascript">
+    function displayCallback(trackData)
+    {
+      document.getElementById('content').innerHTML += 
+        "<p>track data: " + JSON.stringify(trackData) + "</p>";
+    }
+    
     function run()
     {
       var face = new Face({host: Config.hostName, port: Config.wsPort});
@@ -16,7 +22,7 @@
       var rootPrefix = new Name("/ndn/edu/ucla/remap/opt");
       var spaceName = new Name("node0");
       
-      var consumer = new Consumer(face, rootPrefix, spaceName);
+      var consumer = new Consumer(face, rootPrefix, spaceName, displayCallback);
       consumer.start();
     }
   </script>
