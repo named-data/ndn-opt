@@ -5,10 +5,8 @@
 //
 //  Author:  Zhehao Wang
 
-// Connection configuration, as connectivity to default WS on NDN testbed is not guaranteed
-
 Config = {
-  // Face configuration
+  // Face configuration, as connectivity to default WS on NDN testbed is not necessary
   hostName					: "localhost",
   wsPort					: 9696,
   

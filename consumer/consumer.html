@@ -9,10 +9,15 @@
   <script type="text/javascript" src="consumer.js"></script>
   
   <script type="text/javascript">
+    /**
+     * displayCallback is passed into the consumer's constructor
+     *
+     * @param {Decoded JSON object} the track data received from consumer
+     */
     function displayCallback(trackData)
     {
       document.getElementById('content').innerHTML += 
-        "<p>track data: " + JSON.stringify(trackData) + "</p>";
+        "track data: " + JSON.stringify(trackData) + "<br>";
     }
     
     function run()

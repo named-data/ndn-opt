@@ -5,8 +5,6 @@
 //
 //  Author:  Zhehao Wang
 
-// How should the consumer know the instance start time?
-
 /**
  * Consumer creates a consumer for ndn-opt; The consumer follows the protocol
  * described here: https://github.com/named-data/ndn-opt/tree/master/publisher
@@ -254,6 +252,10 @@ Consumer.prototype.fetchTrackHint = function()
     (hintInterest, this.onHintData.bind(this), this.onHintTimeout.bind(this));
 };
 
+/**
+ * Consumer starts by issuing interest with given [root prefix]/[space name], 
+ * and try to fetch the right most piece of matching data, and extract its timestamp.
+ */
 Consumer.prototype.start = function() {
   // fetch initial data, since consumer does not know about the value of starting time component
   var initialInterest = new Interest(this.prefix);
