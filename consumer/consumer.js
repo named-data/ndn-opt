@@ -148,6 +148,9 @@ Consumer.prototype.onHintData = function(interest, data)
   
   hintInterest.setMustBeFresh(true);
   hintInterest.setInterestLifetimeMilliseconds(Config.defaultHintLifetime);
+  // for hint interest, the rightMostChild is preferred.
+  hintInterest.setChildSelector(1);
+  
   this.face.expressInterest
     (hintInterest, this.onHintData.bind(this), this.onHintTimeout.bind(this));
 };
@@ -210,6 +213,9 @@ Consumer.prototype.reexpressInitialInterest = function(interest)
   var initialInterest = new Interest(this.prefix);
   initialInterest.setMustBeFresh(true);
   initialInterest.setInterestLifetimeMilliseconds(Config.defaultInitialLifetime);
+  // for initial interest, the rightMostChild is preferred
+  initialInterest.setChildSelector(1);
+  
   this.face.expressInterest
     (initialInterest, this.onInitialData.bind(this), this.onInitialTimeout.bind(this));
 };
@@ -253,6 +259,9 @@ Consumer.prototype.start = function() {
   var initialInterest = new Interest(this.prefix);
   initialInterest.setMustBeFresh(true);
   initialInterest.setInterestLifetimeMilliseconds(Config.defaultInitialLifetime);
+  // for initial interest, the rightMostChild is preferred
+  initialInterest.setChildSelector(1);
+  
   this.face.expressInterest
     (initialInterest, this.onInitialData.bind(this), this.onInitialTimeout.bind(this));
 };
