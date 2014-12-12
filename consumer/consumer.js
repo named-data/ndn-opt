@@ -12,7 +12,8 @@
  *
  * @param {Face} The websocket face which consumer uses;
  * @param {Name} The [root] prefix that producer uses; Before [space_name] component;
- * @param {Name} The [space_name] prefix that producer uses; Full prefix = root + space_name
+ * @param {Name} The [space_name] prefix that producer uses; Full prefix = [root]/[space_name]
+ * @param {function(decoded JSON object)} Function called whenever the consumer fetched track data
  */
 var Consumer = function(face, root, spaceName, displayCallback)
 {
