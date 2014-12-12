@@ -11,10 +11,10 @@
 5. Make sure producer's running, and the nfd websocket you are connecting to has a route to the producer
 
 ### Consumer
-The consumer tries to fetch the the [starting timestamp] with configured prefix, and fetches track hint and data for that [starting timestamp]
+The consumer tries to fetch the [starting timestamp] with configured prefix, and fetches track hint and data under that [starting timestamp]
 
-The consumer maintains an outstanding interest for track hint. 
+The consumer maintains an outstanding interest for track hint, with older timestamps excluded. 
 
-For each new active track mentioned in track hint, consumer maintains an outstanding interest for its sequential data.
+For each new active track mentioned in track hint, the consumer maintains an outstanding interest for the new data sequence number.
 
 The consumer stops maintaining outstanding interest for a track when a series of timeouts is received.
