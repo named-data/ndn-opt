@@ -5,7 +5,7 @@
 
 ### How to use
 1. Clone repository
-2. Replace the link to ndn.js in consumer directory with actual ndn.js
+2. Replace the link to ndn.js in consumer directory with the actual ndn.js, which can be grabbed from the repository in the link above.
 3. Edit [config.js](https://github.com/named-data/ndn-opt/blob/master/consumer/config.js) for namespace and face setup
 4. Launch [consumer.html](https://github.com/named-data/ndn-opt/blob/master/consumer/consumer.html) in a browser, and click "Start consumer" button.
 5. Make sure producer's running, and the nfd websocket you are connecting to has a route to the producer

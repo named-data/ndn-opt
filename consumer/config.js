@@ -7,7 +7,7 @@
 
 Config = {
   // Face configuration, as connectivity to default WS on NDN testbed is not necessary
-  hostName					: "localhost",
+  hostName					: "192.168.100.101",
   wsPort					: 9696,
   
   // Namespace configuration
