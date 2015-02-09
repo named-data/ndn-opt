@@ -16,7 +16,7 @@ Directories structure follows established [ROS guidelines](http://wiki.ros.org/R
 
 ### Prerequisites
 
-1. [NDN-CPP library](github.com/named-data/ndn-cpp)
+1. [NDN-CPP library](https://github.com/named-data/ndn-cpp)
 
 ### How to use
 1. Clone repository
