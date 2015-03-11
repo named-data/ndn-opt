@@ -61,8 +61,8 @@ Consumer.prototype.onTrackData = function(interest, data)
     this.activeTracks[activeTrackIndex].timeoutCnt = 0;
   }
   else {
-	this.activeTracks.push({"id": trackId,
-						   "timeoutCnt": 0});
+    this.activeTracks.push({"id": trackId,
+                           "timeoutCnt": 0});
   }
   
   var receivedSeq = interest.getName().get(-1).toEscapedString();
@@ -95,13 +95,23 @@ Consumer.prototype.onTrackTimeout = function(interest)
   
   if (activeTrackIndex != -1) {
     if (this.activeTracks[activeTrackIndex].timeoutCnt < Config.trackTimeoutThreshold) {
-	  this.face.expressInterest
-	    (interest, this.onTrackData.bind(this), this.onTrackTimeout.bind(this));
-	  this.activeTracks[activeTrackIndex].timeoutCnt ++;
-	}
-	else {
-	  this.activeTracks.splice(activeTrackIndex, 1);
-	}
+      var reexpressInterest = new Interest(interest.getName().getPrefix(-1));
+      
+      // For express interest, rightMostChild is preferred
+      reexpressInterest.setChildSelector(1);
+  
+      var exclude = new Exclude();
+      exclude.appendAny();
+      exclude.appendComponent(interest.getName().get(-1));
+      reexpressInterest.setExclude(exclude);
+  
+      this.face.expressInterest
+        (reexpressInterest, this.onTrackData.bind(this), this.onTrackTimeout.bind(this));
+      this.activeTracks[activeTrackIndex].timeoutCnt ++;
+    }
+    else {
+      this.activeTracks.splice(activeTrackIndex, 1);
+    }
   }
 };
 
