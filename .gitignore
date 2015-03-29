@@ -32,3 +32,5 @@
 ._*
 .fseventsd
 .catkin_workspace
+
+*.*~

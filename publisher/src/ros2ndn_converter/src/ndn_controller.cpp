@@ -52,7 +52,7 @@ NdnController::startNdnProcessing()
 	// register prefix
 	Name instancePrefix(parameters_.prefix);
 	memoryCache_->registerPrefix(instancePrefix, bind(&NdnController::onRegisterFailed,
-		this, _1));
+		this, _1), bind(&NdnController::onInterest, this, _1, _2, _3, _4));
 
 	ROS_DEBUG_STREAM("prefix registration intiated. starting process events loop...");
 
@@ -62,6 +62,42 @@ NdnController::startNdnProcessing()
 	ROS_DEBUG_STREAM("NDN processing started");
 
 	return 0;	
+}
+
+// Zhehao: onInterest implementation
+// Note: Ignoring if the same interest should be handled here.
+void
+NdnController::onInterest
+  (const ptr_lib::shared_ptr<const Name>& prefix,
+   const ptr_lib::shared_ptr<const Interest>& interest, Transport& transport,
+   uint64_t registerPrefixId)
+{
+	ROS_DEBUG_STREAM("PendingInterest added");
+	pendingInterestTable_.push_back(ptr_lib::shared_ptr<PendingInterest>
+	  (new PendingInterest(interest, transport)));
+}
+
+// Zhehao: pending interest class method implementation
+PendingInterest::PendingInterest
+  (const ptr_lib::shared_ptr<const Interest>& interest, Transport& transport)
+  : interest_(interest), transport_(transport)
+{
+  // Set up timeoutTime_.
+  if (interest_->getInterestLifetimeMilliseconds() >= 0.0)
+    timeoutTimeMilliseconds_ = ndn_getNowMilliseconds() +
+      interest_->getInterestLifetimeMilliseconds();
+  else
+    // No timeout.
+    timeoutTimeMilliseconds_ = -1.0;
+}
+
+// Zhehao: Copied methods from Jeff's c/util/time.h, which is not exposed
+ndn_MillisecondsSince1970
+ndn::ndn_getNowMilliseconds()
+{
+	struct timeval t;
+	gettimeofday(&t, 0);
+	return t.tv_sec * 1000.0 + t.tv_usec / 1000.0;
 }
 
 int 
@@ -96,6 +132,31 @@ NdnController::publishMessage(const string& name, const int& dataFreshnessMs, co
 	{
 		boost::mutex::scoped_lock scopedLock(faceMutex_);
 		memoryCache_->add(ndnData);
+
+		// Zhehao: add pendingInterestTable operations after adding to memory contentcache		
+		// Remove timed-out interests and check if the data packet matches any pending
+		// interest.
+		// Go backwards through the list so we can erase entries.
+		MillisecondsSince1970 nowMilliseconds = ndn_getNowMilliseconds();
+		for (int i = (int)pendingInterestTable_.size() - 1; i >= 0; --i) {
+			if (pendingInterestTable_[i]->isTimedOut(nowMilliseconds)) {
+				pendingInterestTable_.erase(pendingInterestTable_.begin() + i);
+				continue;
+			}
+
+			if (pendingInterestTable_[i]->getInterest()->matchesName(ndnData.getName())) {
+				try {
+					// Send to the same transport from the original call to onInterest.
+					// wireEncode returns the cached encoding if available.
+					pendingInterestTable_[i]->getTransport().send(*ndnData.wireEncode());
+				}
+				catch (std::exception& e) {
+				}
+
+				// The pending interest is satisfied, so remove it.
+				pendingInterestTable_.erase(pendingInterestTable_.begin() + i);
+			}
+		}   
 	}
 
 	ROS_DEBUG_STREAM("published data " << name);

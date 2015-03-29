@@ -1,14 +1,15 @@
 // ndn_controller.h
 //
-//  Copyright 2013 Regents of the University of California
-//  For licensing details see the LICENSE file.
+//	Copyright 2013 Regents of the University of California
+//	For licensing details see the LICENSE file.
 //
-//  Author:  Peter Gusev
+//	Author:	Peter Gusev
 //
 
 #ifndef __ndn_controller_h__
 #define __ndn_controller_h__
 
+#include <vector>
 #include <ros/ros.h>
 #include <boost/thread.hpp>
 
@@ -21,8 +22,64 @@
 #include <ndn-cpp/util/memory-content-cache.hpp>
 #include <ndn-cpp/security/key-chain.hpp>
 
+#include <time.h>
+#include <ndn-cpp/c/common.h>
+
  namespace ndn 
  {
+	ndn_MillisecondsSince1970
+	ndn_getNowMilliseconds();
+
+	/**
+	 * A PendingInterest holds an interest which onInterest received but could
+	 * not satisfy. When we add a new data packet to the contentCache_, we will
+	 * also check if it satisfies a pending interest.
+	 */
+	class PendingInterest {
+	public:
+		/**
+		 * Create a new PendingInterest and set the timeoutTime_ based on the current time and the interest lifetime.
+		 * @param interest A shared_ptr for the interest.
+		 * @param transport The transport from the onInterest callback. If the
+		 * interest is satisfied later by a new data packet, we will send the data
+		 * packet to the transport.
+		 */
+		PendingInterest
+			(const ptr_lib::shared_ptr<const Interest>& interest,
+			 Transport& transport);
+
+		/**
+		 * Return the interest given to the constructor.
+		 */
+		const ptr_lib::shared_ptr<const Interest>&
+		getInterest() { return interest_; }
+
+		/**
+		 * Return the transport given to the constructor.
+		 */
+		Transport&
+		getTransport() { return transport_; }
+
+		/**
+		 * Check if this interest is timed out.
+		 * @param nowMilliseconds The current time in milliseconds from ndn_getNowMilliseconds.
+		 * @return true if this interest timed out, otherwise false.
+		 */
+		bool
+		isTimedOut(MillisecondsSince1970 nowMilliseconds)
+		{
+			return timeoutTimeMilliseconds_ >= 0.0 && nowMilliseconds >= timeoutTimeMilliseconds_;
+		}
+
+	private:
+		ptr_lib::shared_ptr<const Interest> interest_;
+		Transport& transport_;
+		MillisecondsSince1970 timeoutTimeMilliseconds_; 
+		/**< The time when the
+		 * interest times out in milliseconds according to ndn_getNowMilliseconds,
+		 * or -1 for no timeout. */
+	};
+
  	/**
  	* This class provides support for publishing on NDN network:
  	* 	- publishing data using Memory Content Cache
@@ -53,6 +110,13 @@
 
 		int 
 		stopNdnProcessing();
+		
+		// Zhehao: onInterest(onDataNotFound) method stores the interest into an application level PIT
+		void
+		onInterest
+			(const ptr_lib::shared_ptr<const Name>& prefix,
+			const ptr_lib::shared_ptr<const Interest>& interest, Transport& transport,
+			uint64_t registerPrefixId);
 
 		int
 		publishMessage(const std::string& name, const int& dataFreshnessMs, const void* message, const int& messageLength);
@@ -76,6 +140,7 @@
 		ptr_lib::shared_ptr<ndn::KeyChain> keyChain_;
 		ptr_lib::shared_ptr<ndn::Face> face_;
 		ptr_lib::shared_ptr<MemoryContentCache> memoryCache_;
+		std::vector<ptr_lib::shared_ptr<PendingInterest> > pendingInterestTable_;
 
 		void 
 		startProcessEventsLoop();
