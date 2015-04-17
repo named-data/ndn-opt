@@ -24,9 +24,14 @@ keyChain_(new KeyChain())
 {
 	ROS_DEBUG_STREAM("NdnController ctor");
 
-	// create face
+	// create face: zhehao: use UnixTransport for local host names
 	ROS_DEBUG_STREAM("creating face...");
-	face_.reset(new Face(parameters_.host.c_str(), parameters_.port));
+	if (parameters_.host != "localhost" && parameters_.host != "127.0.0.1") {
+		face_.reset(new Face(parameters_.host.c_str(), parameters_.port));
+	} else {
+		face_.reset(new Face());
+	}
+
 	face_->setCommandSigningInfo(*keyChain_, keyChain_->getDefaultCertificateName());
 
 	ROS_DEBUG_STREAM("face created. creating memory cache...");
