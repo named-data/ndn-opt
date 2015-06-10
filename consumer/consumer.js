@@ -5,6 +5,8 @@
 //
 //  Author:  Zhehao Wang
 
+// TODO: Pipelining consumer and node consumer update
+
 /**
  * Consumer creates a consumer for ndn-opt; The consumer follows the protocol
  * described here: https://github.com/named-data/ndn-opt/tree/master/publisher
