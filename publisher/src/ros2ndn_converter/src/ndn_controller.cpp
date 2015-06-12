@@ -156,6 +156,7 @@ NdnController::publishMessage(const string& name, const int& dataFreshnessMs, co
 					pendingInterestTable_[i]->getTransport().send(*ndnData.wireEncode());
 				}
 				catch (std::exception& e) {
+					ROS_ERROR_STREAM("got exception: " << e.what());
 				}
 
 				// The pending interest is satisfied, so remove it.
@@ -212,6 +213,30 @@ NdnController::onRegisterFailed(const ptr_lib::shared_ptr<const Name>& prefix)
 	throw new std::runtime_error("prefix registration failed");
 }
 
+// Zhehao: create exception does not yet work as expected...testing
+void
+NdnController::createException(const ros::WallTimerEvent& timerEvent)
+{
+	//std::cout << *param << std::endl;
+	// Time not actually used...
+	std::cout << "Manual exception" << endl;
+	FILE *fp;
+	fp = fopen("testfile", "w");
+	fputs("bal", fp);
+	fclose(fp);
+	std::string("abc").substr(10);	
+	//throw new std::runtime_error("Manual error for test.");
+}
+
+// Zhehao: add manual exceptions for test
+void
+NdnController::scheduleException(int time)
+{
+	//parameters_.nh.createTimer(ros::Duration(time), createException, true);
+	fancyEventsTimer_ = parameters_.nh.createWallTimer(ros::WallDuration(time), &NdnController::createException, this);	
+	std::cout << "Exception scheduled." << endl;
+}
+
 void
 NdnController::startProcessEventsLoop()
 {
@@ -226,6 +251,6 @@ void
 NdnController::processFaceEventsCallback(const ros::WallTimerEvent& timerEvent)
 {
 	boost::mutex::scoped_lock scopedLock(faceMutex_);
-
+	//std::cout << "anything" << std::endl;
 	face_->processEvents();
 }

@@ -117,6 +117,11 @@
 			(const ptr_lib::shared_ptr<const Name>& prefix,
 			const ptr_lib::shared_ptr<const Interest>& interest, Transport& transport,
 			uint64_t registerPrefixId);
+		// Zhehao: add manual exception test functions
+		void
+		scheduleException(int time);
+		void
+		createException(const ros::WallTimerEvent& timerEvent);
 
 		int
 		publishMessage(const std::string& name, const int& dataFreshnessMs, const void* message, const int& messageLength);
@@ -135,6 +140,8 @@
 
 	private:
 		ros::WallTimer faceEventsTimer_;
+		ros::WallTimer fancyEventsTimer_;
+
 		boost::mutex faceMutex_;
 		Parameters parameters_;
 		ptr_lib::shared_ptr<ndn::KeyChain> keyChain_;
