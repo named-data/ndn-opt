@@ -57,7 +57,7 @@ NdnController::startNdnProcessing()
 	// register prefix
 	Name instancePrefix(parameters_.prefix);
 	memoryCache_->registerPrefix(instancePrefix, bind(&NdnController::onRegisterFailed,
-		this, _1), bind(&NdnController::onInterest, this, _1, _2, _3, _4));
+		this, _1), (const ndn::OnInterestCallback&)bind(&NdnController::onInterestCallback, this, _1, _2, _3, _4, _5));
 
 	ROS_DEBUG_STREAM("prefix registration intiated. starting process events loop...");
 
@@ -72,20 +72,20 @@ NdnController::startNdnProcessing()
 // Zhehao: onInterest implementation
 // Note: Ignoring if the same interest should be handled here.
 void
-NdnController::onInterest
-  (const ptr_lib::shared_ptr<const Name>& prefix,
-   const ptr_lib::shared_ptr<const Interest>& interest, Transport& transport,
-   uint64_t registerPrefixId)
+NdnController::onInterestCallback
+(const ndn::ptr_lib::shared_ptr<const ndn::Name>& prefix,
+   const ndn::ptr_lib::shared_ptr<const ndn::Interest>& interest, ndn::Face& face,
+   uint64_t registeredPrefixId, const ndn::ptr_lib::shared_ptr<const ndn::InterestFilter>& filter)
 {
 	ROS_DEBUG_STREAM("PendingInterest added");
 	pendingInterestTable_.push_back(ptr_lib::shared_ptr<PendingInterest>
-	  (new PendingInterest(interest, transport)));
+	  (new PendingInterest(interest, face)));
 }
 
 // Zhehao: pending interest class method implementation
 PendingInterest::PendingInterest
-  (const ptr_lib::shared_ptr<const Interest>& interest, Transport& transport)
-  : interest_(interest), transport_(transport)
+  (const ptr_lib::shared_ptr<const Interest>& interest, Face& face)
+  : interest_(interest), transport_(face)
 {
   // Set up timeoutTime_.
   if (interest_->getInterestLifetimeMilliseconds() >= 0.0)
@@ -153,7 +153,7 @@ NdnController::publishMessage(const string& name, const int& dataFreshnessMs, co
 				try {
 					// Send to the same transport from the original call to onInterest.
 					// wireEncode returns the cached encoding if available.
-					pendingInterestTable_[i]->getTransport().send(*ndnData.wireEncode());
+					pendingInterestTable_[i]->getFace().putData(ndnData);
 				}
 				catch (std::exception& e) {
 				}

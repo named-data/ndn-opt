@@ -46,7 +46,7 @@
 		 */
 		PendingInterest
 			(const ptr_lib::shared_ptr<const Interest>& interest,
-			 Transport& transport);
+			 Face& transport);
 
 		/**
 		 * Return the interest given to the constructor.
@@ -56,9 +56,9 @@
 
 		/**
 		 * Return the transport given to the constructor.
-		 */
-		Transport&
-		getTransport() { return transport_; }
+                 */
+		Face
+		getFace() { return transport_; }
 
 		/**
 		 * Check if this interest is timed out.
@@ -73,7 +73,7 @@
 
 	private:
 		ptr_lib::shared_ptr<const Interest> interest_;
-		Transport& transport_;
+		Face& transport_;
 		MillisecondsSince1970 timeoutTimeMilliseconds_; 
 		/**< The time when the
 		 * interest times out in milliseconds according to ndn_getNowMilliseconds,
@@ -113,10 +113,10 @@
 		
 		// Zhehao: onInterest(onDataNotFound) method stores the interest into an application level PIT
 		void
-		onInterest
-			(const ptr_lib::shared_ptr<const Name>& prefix,
-			const ptr_lib::shared_ptr<const Interest>& interest, Transport& transport,
-			uint64_t registerPrefixId);
+		onInterestCallback
+			(const ndn::ptr_lib::shared_ptr<const ndn::Name>& prefix,
+   const ndn::ptr_lib::shared_ptr<const ndn::Interest>& interest, ndn::Face& face,
+   uint64_t registeredPrefixId, const ndn::ptr_lib::shared_ptr<const ndn::InterestFilter>& filter);
 
 		int
 		publishMessage(const std::string& name, const int& dataFreshnessMs, const void* message, const int& messageLength);
