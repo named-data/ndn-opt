@@ -18,6 +18,8 @@ Directories structure follows established [ROS guidelines](http://wiki.ros.org/R
 
 1. [NDN-CPP library](https://github.com/named-data/ndn-cpp)
 
+Please build NDN-CPP with Boost functions and shared pointers; currently testing with std shared pointers and functions.
+
 ### How to use
 1. Clone repository
 2. Build the package and make sure it is visible to ROS:
