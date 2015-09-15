@@ -77,7 +77,7 @@ NdnController::onInterestCallback
    const ndn::ptr_lib::shared_ptr<const ndn::Interest>& interest, ndn::Face& face,
    uint64_t registeredPrefixId, const ndn::ptr_lib::shared_ptr<const ndn::InterestFilter>& filter)
 {
-	ROS_DEBUG_STREAM("PendingInterest added");
+	std::cout<<"PendingInterest added" << interest->getName().toUri() <<std::endl;
 	pendingInterestTable_.push_back(ptr_lib::shared_ptr<PendingInterest>
 	  (new PendingInterest(interest, face)));
 }
@@ -156,6 +156,7 @@ NdnController::publishMessage(const string& name, const int& dataFreshnessMs, co
 					pendingInterestTable_[i]->getFace().putData(ndnData);
 				}
 				catch (std::exception& e) {
+					std::cout<<"got exception in publishMessage: " << e.what()<<std::endl;
 				}
 
 				// The pending interest is satisfied, so remove it.

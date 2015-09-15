@@ -57,7 +57,7 @@
 		/**
 		 * Return the transport given to the constructor.
                  */
-		Face
+		Face&
 		getFace() { return transport_; }
 
 		/**
