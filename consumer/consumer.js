@@ -97,13 +97,17 @@ Consumer.prototype.onTrackTimeout = function(interest)
   
   if (activeTrackIndex != -1) {
     if (this.activeTracks[activeTrackIndex].timeoutCnt < Config.trackTimeoutThreshold) {
-	  this.face.expressInterest
-	    (interest, this.onTrackData.bind(this), this.onTrackTimeout.bind(this));
-	  this.activeTracks[activeTrackIndex].timeoutCnt ++;
-	}
-	else {
-	  this.activeTracks.splice(activeTrackIndex, 1);
-	}
+      var newInterest = new Interest(interest.getName().toUri());
+      newInterest.setMustBeFresh(true);
+      newInterest.setInterestLifetimeMilliseconds(Config.defaultHintLifetime);
+
+	    this.face.expressInterest
+	      (newInterest, this.onTrackData.bind(this), this.onTrackTimeout.bind(this));
+	    this.activeTracks[activeTrackIndex].timeoutCnt ++;
+	  }
+	  else {
+	    this.activeTracks.splice(activeTrackIndex, 1);
+	  }
   }
 };
 
@@ -166,8 +170,12 @@ Consumer.prototype.onHintTimeout = function(interest)
   //var timeout = new Interest(new Name("/local/timeout"));
   //timeout.setInterestLifetimeMilliseconds(Config.defaultReexpressInterval);
   
+  var newInterest = new Interest(interest);
+  newInterest.setInterestLifetimeMilliseconds(Config.defaultTrackLifetime);
+  newInterest.setMustBeFresh(true);
+
   this.face.expressInterest
-    (interest, this.onHintData.bind(this), this.onHintTimeout.bind(this));
+    (newInterest, this.onHintData.bind(this), this.onHintTimeout.bind(this));
 };
 
 // Meta data not yet published
