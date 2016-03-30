@@ -1,4 +1,4 @@
 ndn-opt
 =======
 
-NDN pubsub for OpenPTrack
+NDN producer and consumer for [OpenPTrack](http://openptrack.org/)
