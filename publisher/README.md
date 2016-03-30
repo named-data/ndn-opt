@@ -18,7 +18,24 @@ Directories structure follows established [ROS guidelines](http://wiki.ros.org/R
 
 1. [NDN-CPP library](https://github.com/named-data/ndn-cpp)
 
-Please build NDN-CPP with Boost functions and shared pointers; currently testing with std shared pointers and functions.
+Please build NDN-CPP with Boost functions and shared pointers. We have tested with NDN-CPP versions 0.8, and 0.9.
+
+For example,
+
+<pre>
+$ git clone https://github.com/named-data/ndn-cpp
+$ cd ndn-cpp
+$ git checkout tags/v0.9
+$ ./configure --with-std-shared-ptr=0 --with-std-function=0
+$ make
+$ make install
+</pre>
+
+2. [NDN forwarder](https://github.com/named-data/NFD/blob/master/docs/INSTALL.rst)
+
+Install NFD per the instructions [here](https://github.com/named-data/NFD/blob/master/docs/INSTALL.rst). 
+
+We have tested with NFD and ndn-cxx versions 0.3.4, and 0.4.0.
 
 ### How to use
 1. Clone repository
