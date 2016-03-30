@@ -16,7 +16,7 @@ Directories structure follows established [ROS guidelines](http://wiki.ros.org/R
 
 ### Prerequisites
 
-1. [NDN-CPP library](https://github.com/named-data/ndn-cpp)
+* [NDN-CPP library](https://github.com/named-data/ndn-cpp)
 
 Please build NDN-CPP with Boost functions and shared pointers. We have tested with NDN-CPP versions 0.8, and 0.9.
 
@@ -31,7 +31,7 @@ $ make
 $ make install
 </pre>
 
-2. [NDN forwarder](https://github.com/named-data/NFD/blob/master/docs/INSTALL.rst)
+* [NDN forwarder](https://github.com/named-data/NFD/blob/master/docs/INSTALL.rst)
 
 Install NFD per the instructions [here](https://github.com/named-data/NFD/blob/master/docs/INSTALL.rst). 
 
@@ -53,10 +53,21 @@ $ rospack find ndn_utils
 <pre>
     $ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
 </pre>
-5. Launch node:
+5. Make sure NFD's running
+if 
+<pre>
+$ nfd-status
+</pre>
+gives error, run
+<pre>
+$ nfd-start
+</pre>
+6. Launch node:
 <pre>
 $ roslaunch ndn_utils ros2ndn_converter.launch
 </pre>
+7. Start consumer:
+Put the producer IP address in [consumer configuration](https://github.com/OpenPTrack/ndn-opt/blob/master/consumer/config.js#L10). Open [consumer](https://github.com/OpenPTrack/ndn-opt/blob/master/consumer/consumer.html) in a browser, and click _start consumer_ when ready. You should see tracking data points printed on the page, if people are tracked.
 
 > **NOTE:** in order to start publishing tracking data over NDN, make sure you have started tracking as well (by running `roslaunch tracking tracking_node.launch` from the terminal).
 
