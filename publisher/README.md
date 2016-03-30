@@ -53,8 +53,7 @@ $ rospack find ndn_utils
 <pre>
     $ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
 </pre>
-5. Make sure NFD's running
-if 
+5. Make sure NFD's running. If 
 <pre>
 $ nfd-status
 </pre>
