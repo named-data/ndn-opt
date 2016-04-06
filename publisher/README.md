@@ -18,7 +18,7 @@ Directories structure follows established [ROS guidelines](http://wiki.ros.org/R
 
 * [NDN-CPP library](https://github.com/named-data/ndn-cpp)
 
-Please build NDN-CPP with Boost functions and shared pointers. We have tested with NDN-CPP versions 0.8, and 0.9.
+Please build NDN-CPP with Boost functions and shared pointers. We have tested with NDN-CPP versions 0.8, and 0.9. (Earlier versions of ndn-cpp, such as v0.6, will not work with this code!)
 
 For example,
 
@@ -28,7 +28,7 @@ $ cd ndn-cpp
 $ git checkout tags/v0.9
 $ ./configure --with-std-shared-ptr=0 --with-std-function=0
 $ make
-$ make install
+$ sudo make install
 </pre>
 
 * [NDN forwarder](https://github.com/named-data/NFD/blob/master/docs/INSTALL.rst)
@@ -38,7 +38,10 @@ Install NFD per the instructions [here](https://github.com/named-data/NFD/blob/m
 We have tested with NFD and ndn-cxx versions 0.3.4, and 0.4.0.
 
 ### How to use
-1. Clone repository
+1. Clone this repository
+<pre>
+$ git clone https://github.com/OpenPTrack/ndn-opt
+</pre>
 2. Build the package and make sure it is visible to ROS:
 <pre>
 $ cd publisher && catkin_make
